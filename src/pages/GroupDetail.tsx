@@ -5,6 +5,7 @@ import { ExpenseCard } from "@/components/ExpenseCard";
 import { BalanceSummary } from "@/components/BalanceSummary";
 import { SettlementList } from "@/components/SettlementList";
 import { AddExpenseDialog } from "@/components/AddExpenseDialog";
+import { EditGroupDialog } from "@/components/EditGroupDialog";
 import { useGroups } from "@/contexts/GroupContext";
 import { Expense } from "@/data/mockData";
 import { calculateBalances, calculateSettlements } from "@/utils/calculations";
@@ -60,7 +61,10 @@ const GroupDetail = () => {
                 <span>{group.members.join(", ")}</span>
               </div>
             </div>
-            <AddExpenseDialog members={group.members} onAddExpense={handleAddExpense} />
+            <div className="flex gap-2">
+              <EditGroupDialog group={group} onUpdateGroup={(updatedGroup) => updateGroup(group.id, updatedGroup)} />
+              <AddExpenseDialog members={group.members} onAddExpense={handleAddExpense} />
+            </div>
           </div>
         </div>
       </header>
