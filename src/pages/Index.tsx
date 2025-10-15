@@ -1,9 +1,19 @@
-import { Plus, Users, TrendingUp } from "lucide-react";
+import { Users, TrendingUp } from "lucide-react";
 import { GroupCard } from "@/components/GroupCard";
-import { Button } from "@/components/ui/button";
-import { mockGroups } from "@/data/mockData";
+import { CreateGroupDialog } from "@/components/CreateGroupDialog";
+import { useGroups } from "@/contexts/GroupContext";
 
 const Index = () => {
+  const { groups, addGroup } = useGroups();
+
+  const handleCreateGroup = (group: { name: string; members: string[] }) => {
+    addGroup({
+      name: group.name,
+      members: group.members,
+      expenses: [],
+    });
+  };
+
   return (
     <div className="min-h-screen bg-background">
       {/* Hero Section */}
@@ -17,10 +27,7 @@ const Index = () => {
               Track shared expenses with friends, split bills fairly, and settle up with ease
             </p>
             <div className="flex flex-wrap gap-4">
-              <Button size="lg" variant="secondary" className="gap-2">
-                <Plus className="h-5 w-5" />
-                Create New Group
-              </Button>
+              <CreateGroupDialog onCreateGroup={handleCreateGroup} />
             </div>
           </div>
         </div>
@@ -36,7 +43,7 @@ const Index = () => {
               </div>
               <div>
                 <p className="text-2xl font-bold text-foreground">
-                  {mockGroups.reduce((sum, g) => sum + g.members.length, 0)}
+                  {groups.reduce((sum, g) => sum + g.members.length, 0)}
                 </p>
                 <p className="text-sm text-muted-foreground">Total Members</p>
               </div>
@@ -50,7 +57,7 @@ const Index = () => {
               </div>
               <div>
                 <p className="text-2xl font-bold text-foreground">
-                  {mockGroups.reduce((sum, g) => sum + g.expenses.length, 0)}
+                  {groups.reduce((sum, g) => sum + g.expenses.length, 0)}
                 </p>
                 <p className="text-sm text-muted-foreground">Total Expenses</p>
               </div>
@@ -64,7 +71,7 @@ const Index = () => {
               </div>
               <div>
                 <p className="text-2xl font-bold text-foreground">
-                  ₹{mockGroups.reduce((sum, g) => 
+                  ₹{groups.reduce((sum, g) => 
                     sum + g.expenses.reduce((expSum, exp) => expSum + exp.amount, 0), 0
                   ).toFixed(2)}
                 </p>
@@ -85,7 +92,7 @@ const Index = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {mockGroups.map((group) => (
+          {groups.map((group) => (
             <GroupCard key={group.id} group={group} />
           ))}
         </div>

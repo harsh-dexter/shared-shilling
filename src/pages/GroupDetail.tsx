@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { ArrowLeft, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -6,14 +5,14 @@ import { ExpenseCard } from "@/components/ExpenseCard";
 import { BalanceSummary } from "@/components/BalanceSummary";
 import { SettlementList } from "@/components/SettlementList";
 import { AddExpenseDialog } from "@/components/AddExpenseDialog";
-import { mockGroups, Expense } from "@/data/mockData";
+import { useGroups } from "@/contexts/GroupContext";
+import { Expense } from "@/data/mockData";
 import { calculateBalances, calculateSettlements } from "@/utils/calculations";
 
 const GroupDetail = () => {
   const { groupId } = useParams();
-  const group = mockGroups.find((g) => g.id === groupId);
-
-  const [expenses, setExpenses] = useState<Expense[]>(group?.expenses || []);
+  const { getGroup, updateGroup } = useGroups();
+  const group = getGroup(groupId!);
 
   if (!group) {
     return (
@@ -28,7 +27,7 @@ const GroupDetail = () => {
     );
   }
 
-  const balances = calculateBalances(expenses, group.members);
+  const balances = calculateBalances(group.expenses, group.members);
   const settlements = calculateSettlements(balances);
 
   const handleAddExpense = (newExpense: Omit<Expense, "id">) => {
@@ -36,7 +35,10 @@ const GroupDetail = () => {
       ...newExpense,
       id: `e${Date.now()}`
     };
-    setExpenses([expense, ...expenses]);
+    updateGroup(group.id, {
+      ...group,
+      expenses: [expense, ...group.expenses]
+    });
   };
 
   return (
@@ -69,14 +71,14 @@ const GroupDetail = () => {
           <div className="lg:col-span-2 space-y-4">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-2xl font-bold text-foreground">Expenses</h2>
-              <span className="text-muted-foreground">{expenses.length} total</span>
+              <span className="text-muted-foreground">{group.expenses.length} total</span>
             </div>
-            {expenses.length === 0 ? (
+            {group.expenses.length === 0 ? (
               <div className="text-center py-12 bg-card rounded-lg border border-border">
                 <p className="text-muted-foreground">No expenses yet. Add one to get started!</p>
               </div>
             ) : (
-              expenses.map((expense) => (
+              group.expenses.map((expense) => (
                 <ExpenseCard key={expense.id} expense={expense} />
               ))
             )}
